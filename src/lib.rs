@@ -10,7 +10,6 @@
 //!     * It should work on *BSD. However, it is not tested.
 #![allow(clippy::bool_comparison)]
 
-#[cfg(unix)]
 /// Cross platform representation of the state the current program running
 #[derive(Debug, PartialEq, Eq)]
 pub enum RunningAs {
@@ -19,8 +18,6 @@ pub enum RunningAs {
     /// Running as a normal user
     User,
 }
-
-use RunningAs::*;
 
 #[cfg(unix)]
 /// This checks whether the current process is running as sudo or not.
@@ -45,6 +42,8 @@ pub fn check() -> RunningAs {
     //if uid == 0 { Root } else { User }
 }
 
+mod window;
+
 // Use windows-rs crate to check admin permission in windows
 #[cfg(windows)]
 /// This checks whether the current process is running as sudo or not.
@@ -60,50 +59,10 @@ pub fn check() -> RunningAs {
 /// }
 /// ```
 pub fn check() -> RunningAs {
-    use windows_api::*;
-    let mut token_handle = INVALID_HANDLE_VALUE;
-    let result = OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token_handle);
-    if result == 0 {
-        return User;
+    match window::is_app_elevated() {
+        true => RunningAs::Root,
+        false => RunningAs::User,
     }
-    let mut token_info = TOKEN_USER {
-        User: SID_AND_ATTRIBUTES {
-            Sid: SID {
-                Revision: 0,
-                SubAuthorityCount: 0,
-                IdentifierAuthority: SID_IDENTIFIER_AUTHORITY {
-                    Value: [0, 0, 0, 0, 0, 0],
-                },
-            },
-            Attributes: 0,
-        },
-    };
-    let token_info_size = std::mem::size_of::<TOKEN_USER>() as u32;
-    let result = GetTokenInformation(
-        token_handle,
-        TokenUser,
-        &mut token_info as *mut TOKEN_USER as *mut c_void,
-        token_info_size,
-        &mut token_info_size,
-    );
-    if result == 0 {
-        return User;
-    }
-    let sid_size = std::mem::size_of::<SID>() as u32;
-    let result = GetLengthSid(token_info.User.Sid);
-    if result == 0 {
-        return User;
-    }
-    let mut sid = vec![0u8; result as usize];
-    let result = GetSidSubAuthority(token_info.User.Sid, 0, sid.as_mut_ptr() as *mut DWORD);
-    if result == 0 {
-        return User;
-    }
-    let result = if sid[0] == SECURITY_BUILTIN_DOMAIN_RID {
-        GetSidSubAuthority(token_info.User.Sid, 1, sid.as_mut_ptr() as *mut DWORD)
-    } else {
-        GetSidSubAuthority(token_info.User.Sid, 0, sid.as_mut_ptr() as *mut DWORD)
-    };
 }
 
 #[cfg(test)]
@@ -112,6 +71,7 @@ mod tests {
     #[test]
     fn it_works() {
         let c = check();
+        println!("{:?}", c);
         assert!(true, "{:?}", c);
     }
 }

@@ -1,22 +1,19 @@
 [package]
 name = "is_sudo"
 version = "0.0.1"
-author = "Spark"
 edition = "2021"
 license = "MIT"
-description = "Check if the process is running as Sudo"
+description = "Checks whether the process is running as root/sudo/admin permission in Windows and Unix systems"
+authors = ["Spa5k"]
+keywords = ["windows", "unix", "linux", "macos", "sudo", "administrator", "root"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 libc = "0.2"
 log = "0.4"
-[dependencies.windows]
-version = "0.39"
-features = [
-  "Data_Xml_Dom",
-  "Win32_Foundation",
-  "Win32_Security",
-  "Win32_System_Threading",
-  "Win32_UI_WindowsAndMessaging",
-]
+
+[target.'cfg(windows)'.dependencies]
+[dependencies.winapi]
+version = "0.3.8"
+features = ["handleapi", "processthreadsapi", "winnt", "securitybaseapi", "impl-default"]
