@@ -10,6 +10,9 @@
 //!     * It should work on *BSD. However, it is not tested.
 #![allow(clippy::bool_comparison)]
 
+use crate::RunningAs::Root;
+use crate::RunningAs::User;
+
 /// Cross platform representation of the state the current program running
 #[derive(Debug, PartialEq, Eq)]
 pub enum RunningAs {
@@ -46,7 +49,7 @@ mod window;
 
 // Use windows-rs crate to check admin permission in windows
 #[cfg(windows)]
-/// This checks whether the current process is running as sudo or not.
+/// This checks whether the current process is running as admin(root) or not.
 /// Returns the RunningAs enum as result
 /// # Examples
 /// ```rust
@@ -55,11 +58,10 @@ mod window;
 /// match running_as {
 ///     RunningAs::Root => println!("Running as root"),
 ///     RunningAs::User => println!("Running as user"),
-///  
 /// }
 /// ```
 pub fn check() -> RunningAs {
-    match window::is_app_elevated() {
+    match window::check_main::is_app_elevated() {
         true => RunningAs::Root,
         false => RunningAs::User,
     }

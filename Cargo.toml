@@ -1,11 +1,11 @@
 [package]
 name = "is_sudo"
 version = "0.0.1"
+authors = ["Spa5k"]
 edition = "2021"
+keywords = ["windows", "unix", "linux", "macos", "sudo", "administrator", "root"]
 license = "MIT"
 description = "Checks whether the process is running as root/sudo/admin permission in Windows and Unix systems"
-authors = ["Spa5k"]
-keywords = ["windows", "unix", "linux", "macos", "sudo", "administrator", "root"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
