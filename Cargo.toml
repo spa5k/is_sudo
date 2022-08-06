@@ -6,6 +6,7 @@ edition = "2021"
 keywords = ["windows", "unix", "linux", "macos", "sudo", "administrator", "root"]
 license = "MIT"
 description = "Checks whether the process is running as root/sudo/admin permission in Windows and Unix systems"
+homepage = "https://github.com/spa5k/is_sudo"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
