@@ -56,6 +56,14 @@ jobs:
         echo "value=$version" >> "$GITHUB_OUTPUT"
     - name: Package crate
       run: cargo package
+    - name: Build release notes from changelog
+      shell: bash
+      run: |
+        awk '
+          $0 ~ /^## \['"${{ steps.version.outputs.value }}"'\]/ { capture=1; next }
+          capture && $0 ~ /^## \[/ { exit }
+          capture { print }
+        ' CHANGELOG.md > release-notes.md
     - name: Upload crate artifact
       uses: actions/upload-artifact@v7.0.0
       with:
@@ -69,5 +77,5 @@ jobs:
       uses: softprops/action-gh-release@v2.6.1
       with:
         name: is_sudo ${{ github.ref_name }}
-        generate_release_notes: true
+        body_path: release-notes.md
         files: target/package/is_sudo-${{ steps.version.outputs.value }}.crate
