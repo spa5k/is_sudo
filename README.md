@@ -17,3 +17,14 @@ fn main() {
     }
 }
 ```
+
+## Release
+
+Push a semver tag such as `v0.0.2` after updating `Cargo.toml`.
+
+The GitHub release workflow will:
+
+- run the test matrix on Linux, macOS, and Windows
+- verify that the tag matches the crate version
+- publish the crate to crates.io using `CARGO_REGISTRY_TOKEN`
+- create a GitHub release and attach the packaged `.crate` file
